@@ -2,52 +2,39 @@ package main
 
 //impoert multiple packages add it on new line
 import (
+	"booking-app/helper" //go will by default search for package int its modules u have to explicitly tell that this is package created by u  mention path where ur helper lies
 	"fmt"
 	"strings"
 )
 
+// package level variables
+var conferenceName = "Go Conference"
+
+const conferenceTickets = 50
+
+var remaining uint = 50
+var bookings = []string{}
+
 func main() {
-	var conferenceName = "Go Conference"
-	const conferenceTickets = 50
-	var remaining uint = 50
 
 	//store usernames in list
-	var bookings = []string{} //bboking list can take up the user values upto 50
+	//bboking list can take up the user values upto 50
 
 	//if u are not assigning value u have to declare the datatype of the variable
-	greetUsers(conferenceName, conferenceTickets, remaining)
+	greetUsers()
 
-	var firstName string
-	var lastName string
-	var email string
-	var userTickets uint
-
-	//Loops to repeat The Logic
 	for {
 		//How to take user input
-		fmt.Println("Enter your first name: ")
-		fmt.Scan(&firstName)
-
-		fmt.Println("Enter your last name: ")
-		fmt.Scan(&lastName)
-
-		fmt.Println("Enter your email: ")
-		fmt.Scan(&email)
-
-		fmt.Println("Enter number of tickets: ")
-		fmt.Scan(&userTickets)
-
+		firstName, lastName, email, userTickets := getUserInput()
 		//User Input Validation
-		isValidInput := ValidateUserInput(firstName, lastName, email, userTickets, remaining)
+		isValidName, isValidEmail, isValidUserTickets := helper.ValidateUserInput(firstName, lastName, email, userTickets, remaining)
 		//For email
 
-		if isValidInput {
-
-			remaining = remaining - userTickets
+		if isValidName && isValidUserTickets && isValidEmail {
 
 			//Arraysbookings[0] = firstName + " " + lastName
 			//Slices
-			bookings = append(bookings, firstName+" "+lastName)
+			remaining, bookings = bookTickets(firstName, lastName, userTickets, remaining, bookings)
 			// firstNames := []string{}
 
 			//it gives index and value back for each element
@@ -58,7 +45,7 @@ func main() {
 
 			// 	firstNames = append(firstNames, names[0])
 			// }
-			firstNames := getFirst(bookings)
+			firstNames := getFirst()
 			fmt.Printf("The firts name of bookings %v\n", firstNames)
 			fmt.Printf("The first value: %v\n", bookings[0])
 			fmt.Printf("Array Type: %T\n", bookings)
@@ -73,6 +60,15 @@ func main() {
 				break //break the indefinite loop
 			}
 		} else {
+			if !isValidName {
+				fmt.Println("Incorrect Name.")
+			}
+			if !isValidEmail {
+				fmt.Println("INcorrcet Email")
+			}
+			if !isValidUserTickets {
+				fmt.Println("Incorrect ticket Number.")
+			}
 			fmt.Printf("We only have %v  tickets remaining\n", remaining)
 			//break   instead of breaking the whole application we just want to skip next steps
 
@@ -84,13 +80,13 @@ func main() {
 
 }
 
-func greetUsers(conferenceName string, conferenceTickets int, remaining uint) {
+func greetUsers() {
 	fmt.Printf("Welcome to %v booking application\n", conferenceName)
 	fmt.Printf("We have a total of %v  tickets and %v are still available\n", conferenceTickets, remaining)
 	fmt.Println("Get your tickets here to attend!")
 
 }
-func getFirst(bookings []string) []string { //inside parameter block there inputs what is comming and outsize thst there is return type
+func getFirst() []string { //inside parameter block there inputs what is comming and outsize thst there is return type
 	firstNames := []string{}
 	for _, booking := range bookings {
 		var names = strings.Fields(booking)
@@ -101,10 +97,45 @@ func getFirst(bookings []string) []string { //inside parameter block there input
 	return firstNames
 }
 
-func ValidateUserInput(firstName string, lastName string, email string, userTickets uint, remaining uint) bool {
-	isValidName := len(firstName) >= 2 && len(lastName) >= 2
-	isValidEmail := strings.Contains(email, "@")
-	isValidUserTickets := userTickets > 0 && userTickets <= remaining
-	//return any numberofvalues from go function
-	return isValidName && isValidEmail && isValidUserTickets
+func getUserInput() (string, string, string, uint) {
+	var firstName string
+	var lastName string
+	var email string
+	var userTickets uint
+
+	//Loops to repeat The Logic
+	fmt.Println("Enter your first name: ")
+	fmt.Scan(&firstName)
+
+	fmt.Println("Enter your last name: ")
+	fmt.Scan(&lastName)
+
+	fmt.Println("Enter your email: ")
+	fmt.Scan(&email)
+
+	fmt.Println("Enter number of tickets: ")
+	fmt.Scan(&userTickets)
+
+	return firstName, lastName, email, userTickets
+
 }
+
+func bookTickets(firstName string, lastName string, userTickets uint, remaining uint, bookings []string) (uint, []string) {
+	remaining = remaining - userTickets
+
+	//Arraysbookings[0] = firstName + " " + lastName
+	//Slices
+	bookings = append(bookings, firstName+" "+lastName)
+	// firstNames := []string{}
+	return remaining, bookings
+}
+
+//instead of passing all values to diff functions every time we create a plce to store all var such that they are accessible to all functions  these are called package level variables.
+
+//Go works in packages
+//A single package can have multiple files
+
+//as long as the files are in one package they can access each other
+//exxample main.go is in booking-app i.e main package
+
+//helper.go is in helpwer package
