@@ -4,7 +4,6 @@ package main
 import (
 	"booking-app/helper" //go will by default search for package int its modules u have to explicitly tell that this is package created by u  mention path where ur helper lies
 	"fmt"
-	"strconv"
 )
 
 // package level variables
@@ -20,7 +19,13 @@ var remaining uint = 50
 // lastName:value
 // email:value
 // userTickets:value
-var bookings = make([]map[string]string, 0) //empty list of maps  along with intial size
+var bookings = make([]User, 0) //empty list of maps  along with intial size
+type User struct {
+	firstName       string
+	lastName        string
+	email           string
+	numberOfTickets uint
+}
 
 func main() {
 
@@ -97,7 +102,7 @@ func getFirst() []string { //inside parameter block there inputs what is comming
 	firstNames := []string{}
 	for _, booking := range bookings {
 		//now here booking as an iterator is pointing to map type
-		firstNames = append(firstNames, booking["firstName"])
+		firstNames = append(firstNames, booking.firstName)
 
 	}
 	//returning values from function
@@ -127,20 +132,23 @@ func getUserInput() (string, string, string, uint) {
 
 }
 
-func bookTickets(firstName string, lastName string, userTickets uint, email string, remaining uint) (uint, []map[string]string) {
+func bookTickets(firstName string, lastName string, userTickets uint, email string, remaining uint) (uint, []User) {
 	remaining = remaining - userTickets
 
 	//Arraysbookings[0] = firstName + " " + lastName
 	//Slices
 
 	//cretae a user dataType using map
-	var userData = make(map[string]string) //map[key_type][data_type]
-	userData["firstName"] = firstName
-	userData["lastName"] = lastName
-	userData["email"] = email
+	var userData = User{ //map[key_type][data_type]
+		firstName:       firstName,
+		lastName:        lastName,
+		email:           email,
+		numberOfTickets: userTickets,
+	}
+
 	//map store keys only of one dataType and and value of only one dataType
 	//to store userTickets of form Uint we need to convert it into stirng
-	userData["numberOfTickets"] = strconv.FormatUint(uint64(userTickets), 10) //10 is for base 10
+
 	bookings = append(bookings, userData)
 	// firstNames := []string{}
 	fmt.Printf("List of booking after every booking: %v\n", bookings)
@@ -161,4 +169,12 @@ func bookTickets(firstName string, lastName string, userTickets uint, email stri
 //no of userTickets
 
 //while map store key and value of same datatype If I wanto to store mixed
-//datatype of user
+//datatype of user  I need a datatype called strcut
+
+// type UserData struct {
+// 	firstName string
+// 	lastName string
+// 	email   uint
+// 	numberOfTickets uint
+
+// }
