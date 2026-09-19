@@ -4,7 +4,7 @@ package main
 import (
 	"booking-app/helper" //go will by default search for package int its modules u have to explicitly tell that this is package created by u  mention path where ur helper lies
 	"fmt"
-	"strings"
+	"strconv"
 )
 
 // package level variables
@@ -13,7 +13,14 @@ var conferenceName = "Go Conference"
 const conferenceTickets = 50
 
 var remaining uint = 50
-var bookings = []string{}
+
+// var bookings = []string{} //bookigs is slice which allows to store strig full_name
+// instead of "Nana Janashia " we want a user datatype of key value pairs
+// firstNme: values
+// lastName:value
+// email:value
+// userTickets:value
+var bookings = make([]map[string]string, 0) //empty list of maps  along with intial size
 
 func main() {
 
@@ -34,7 +41,7 @@ func main() {
 
 			//Arraysbookings[0] = firstName + " " + lastName
 			//Slices
-			remaining, bookings = bookTickets(firstName, lastName, userTickets, remaining, bookings)
+			remaining, bookings = bookTickets(firstName, lastName, userTickets, email, remaining)
 			// firstNames := []string{}
 
 			//it gives index and value back for each element
@@ -89,8 +96,8 @@ func greetUsers() {
 func getFirst() []string { //inside parameter block there inputs what is comming and outsize thst there is return type
 	firstNames := []string{}
 	for _, booking := range bookings {
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		//now here booking as an iterator is pointing to map type
+		firstNames = append(firstNames, booking["firstName"])
 
 	}
 	//returning values from function
@@ -120,13 +127,23 @@ func getUserInput() (string, string, string, uint) {
 
 }
 
-func bookTickets(firstName string, lastName string, userTickets uint, remaining uint, bookings []string) (uint, []string) {
+func bookTickets(firstName string, lastName string, userTickets uint, email string, remaining uint) (uint, []map[string]string) {
 	remaining = remaining - userTickets
 
 	//Arraysbookings[0] = firstName + " " + lastName
 	//Slices
-	bookings = append(bookings, firstName+" "+lastName)
+
+	//cretae a user dataType using map
+	var userData = make(map[string]string) //map[key_type][data_type]
+	userData["firstName"] = firstName
+	userData["lastName"] = lastName
+	userData["email"] = email
+	//map store keys only of one dataType and and value of only one dataType
+	//to store userTickets of form Uint we need to convert it into stirng
+	userData["numberOfTickets"] = strconv.FormatUint(uint64(userTickets), 10) //10 is for base 10
+	bookings = append(bookings, userData)
 	// firstNames := []string{}
+	fmt.Printf("List of booking after every booking: %v\n", bookings)
 	return remaining, bookings
 }
 
@@ -139,3 +156,9 @@ func bookTickets(firstName string, lastName string, userTickets uint, remaining 
 //exxample main.go is in booking-app i.e main package
 
 //helper.go is in helpwer package
+
+//Now we are just saving firstName ,lastName, but we also want to save email,
+//no of userTickets
+
+//while map store key and value of same datatype If I wanto to store mixed
+//datatype of user
